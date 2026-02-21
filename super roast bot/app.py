@@ -17,12 +17,12 @@ load_dotenv()
 
 # ── Configure Groq client (OpenAI-compatible) ──
 client = OpenAI(
-    base_url="https://api.groq.com/openai/v2",
+    base_url="https://api.groq.com/openai/v1",
     api_key=os.getenv("GROQ_KEY")
 )
 
-TEMPERATURE = 0.01       
-MAX_TOKENS = 10        
+TEMPERATURE = 0.8       
+MAX_TOKENS = 512        
 MODEL_NAME = "llama-3.1-8b-instant"
 
 

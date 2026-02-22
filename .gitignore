@@ -1,0 +1,9 @@
+# SQLite databases
+*.db
+roast_history.db
+# Python bytecode
+__pycache__/
+*.pyc
+# Environment variables
+.env
+# Logs

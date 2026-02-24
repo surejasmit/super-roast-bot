@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -7,22 +8,49 @@ from rag import retrieve_context
 from prompt import SYSTEM_PROMPT
 from memory import add_to_memory, format_memory, clear_memory
 
+<<<<<<< HEAD
 load_dotenv()
+=======
+# ── Load environment variables from the .env file next to this script ──
+load_dotenv(dotenv_path=Path(__file__).parent / ".env", override=True)
+
+# ── Validate the API key is present and not a placeholder ──
+_api_key = os.getenv("GROQ_KEY")
+if not _api_key or _api_key.strip() in ("", "YOUR API KEY", "your_groq_api_key_here"):
+    raise EnvironmentError(
+        "GROQ_KEY is not set or is still the placeholder value. "
+        "Please add your Groq API key to the .env file:\n"
+        "  GROQ_KEY=your_actual_key_here"
+    )
+
+# ── Configuration ──
+GROQ_API_KEY = os.getenv("GROQ_KEY")
+if not GROQ_API_KEY:
+    st.error("❌ GROQ_KEY not found in .env file. Please configure your API key.")
+    st.stop()
+>>>>>>> upstream/main
 
 # Fixed base_url to v1 and model name to instant
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key=os.getenv("GROQ_KEY")
+    api_key=GROQ_API_KEY
 )
 
-TEMPERATURE = 0.01       
-MAX_TOKENS = 200      
-MODEL_NAME = "llama-3.1-8b-instant"
+TEMPERATURE = float(os.getenv("TEMPERATURE", 0.8))
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", 512))
+MODEL_NAME = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
 
 def chat(user_input: str) -> str:
+<<<<<<< HEAD
+=======
+    """Generate a roast response for the user's input using structured messages."""
+
+    # used .strip to remove whitespaces 
+>>>>>>> upstream/main
     if not user_input or user_input.isspace():
         return "You sent me nothing? Even your messages are empty, just like your GitHub graph. 🔥"
 
+<<<<<<< HEAD
     context = retrieve_context(user_input)
     history = format_memory()
 
@@ -45,6 +73,48 @@ def chat(user_input: str) -> str:
     reply = response.choices[0].message.content
     add_to_memory(user_input, reply)
     return reply
+=======
+    try:
+        # Retrieve relevant roast context via RAG
+        context = retrieve_context(user_input)
+
+        # Get conversation history
+        history = format_memory()
+
+        # Build structured messages to avoid prompt injection and instruction mixing
+        messages = [
+            {
+                "role": "user",
+                "content": (
+                    f"Roast context (from knowledge base):\n{context}\n\n"
+                    f"Recent conversation:\n{history}\n\n"
+                    f"Current message: {user_input}"
+                ),
+            },
+        ]
+
+        # Generate response from Groq using structured system prompt
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                *messages,
+            ],
+            temperature=TEMPERATURE,
+            max_tokens=MAX_TOKENS,
+        )
+
+        reply = response.choices[0].message.content
+
+        # Store in memory
+        add_to_memory(user_input, reply)
+
+        return reply
+
+    except Exception as e:
+        st.error(f"Error generating roast: {e}")
+        return f"Even I broke trying to roast you. Error: {str(e)[:100]}"
+>>>>>>> upstream/main
 
 st.set_page_config(page_title="Super RoastBot", page_icon="🔥", layout="centered")
 st.title("🔥Super RoastBot")
@@ -55,7 +125,26 @@ with st.sidebar:
     if st.button("🗑️ Clear Chat"):
         st.session_state.messages = []
         clear_memory()
+        st.success("Chat cleared!")
         st.rerun()
+<<<<<<< HEAD
+=======
+    st.divider()
+    st.markdown(
+        "**How it works:**\n"
+        "1. Your message is sent to RAG retrieval\n"
+        "2. Relevant roast knowledge is fetched\n"
+        "3. Groq crafts a personalized roast\n"
+        "4. You cry. Repeat."
+    )
+    st.divider()
+    st.markdown(
+        "**⚙️ Config (env-based):**\n"
+        f"- Model: `{MODEL_NAME}`\n"
+        f"- Temp: `{TEMPERATURE}`\n"
+        f"- Max tokens: `{MAX_TOKENS}`"
+    )
+>>>>>>> upstream/main
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -71,9 +160,16 @@ if user_input := st.chat_input("Say something... if you dare 🔥"):
 
     with st.chat_message("assistant", avatar="😈"):
         with st.spinner("Cooking up a roast... 🍳"):
+<<<<<<< HEAD
             try:
                 reply = chat(user_input)
                 st.markdown(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
             except Exception as e:
                 st.error(f"Even I broke trying to roast you. Error: {e}")
+=======
+            reply = chat(user_input)
+            st.markdown(reply)
+
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+>>>>>>> upstream/main

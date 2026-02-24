@@ -1,2 +1,25 @@
+<<<<<<< HEAD
 .env
 "super roast bot/.env"
+=======
+# Environment variables — never commit real secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Streamlit
+.streamlit/
+
+# OS
+.DS_Store
+Thumbs.db
+>>>>>>> upstream/main

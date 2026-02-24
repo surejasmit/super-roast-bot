@@ -3,11 +3,9 @@ Memory Module for RoastBot - Now with SQLite Persistent Storage!
 Chat history persists across server restarts using SQLite database.
 """
 
-from collections import deque
 from database import add_chat_entry, get_chat_history, clear_chat_history
 
 MAX_MEMORY = 5
-chat_history = deque(maxlen=MAX_MEMORY)
 
 
 def add_to_memory(user_msg: str, bot_msg: str, session_id: str = "default"):

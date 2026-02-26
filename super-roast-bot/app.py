@@ -1,15 +1,17 @@
 import os
-=======
 import uuid
 import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
+
 from rag import retrieve_context
 from prompt import SYSTEM_PROMPT
 from memory import add_to_memory, format_memory, clear_memory
 
+# Load environment variables
 load_dotenv()
 
+# Initialize Groq client securely using environment variable
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
     api_key=os.getenv("GROQ_KEY")
@@ -18,6 +20,7 @@ client = OpenAI(
 TEMPERATURE = 0.8
 MAX_TOKENS = 512
 MODEL_NAME = "llama-3.1-8b-instant"
+
 
 def chat_stream(user_input: str):
     if not user_input or user_input.isspace():
@@ -54,6 +57,7 @@ def chat_stream(user_input: str):
     except Exception as e:
         yield f"Even I broke trying to roast you. Error: {str(e)[:100]}"
 
+
 def chat(user_input: str) -> str:
     if not user_input.strip():
         return "You sent me nothing? Even your messages are empty like your resume. 🔥"
@@ -79,14 +83,17 @@ def chat(user_input: str) -> str:
         )
 
         reply = response.choices[0].message.content
-    # Store in memory
-    add_to_memory(user_input, reply)
+
+        # Store in memory (only once)
         add_to_memory(user_input, reply, st.session_state.session_id)
->>>>>>> 8c83bec (Security fix: ensured API key revoked and environment variable usage)
+
         return reply
 
     except Exception as e:
         return f"Even I broke trying to roast you. Error: {str(e)[:100]}"
+
+
+# ---------------- UI ---------------- #
 
 st.set_page_config(page_title="Super RoastBot", page_icon="🔥", layout="centered")
 
@@ -101,18 +108,19 @@ if "session_id" not in st.session_state:
 
 with st.sidebar:
     st.header("⚙️ Controls")
-
-
     enable_streaming = st.toggle("Enable Streaming", value=True)
+
     if st.button("🗑️ Clear Chat"):
         st.session_state.messages = []
         clear_memory(st.session_state.session_id)
         st.rerun()
 
+# Display chat history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar="😈" if msg["role"] == "assistant" else "🤡"):
         st.markdown(msg["content"])
 
+# User input
 if user_input := st.chat_input("Say something... if you dare 🔥"):
 
     st.session_state.messages.append({"role": "user", "content": user_input})

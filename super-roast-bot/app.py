@@ -1,14 +1,7 @@
-"""
-RoastBot 🔥 — A RAG-based AI chatbot that roasts you into oblivion.
-Built with Streamlit + Groq + FAISS.
-"""
-
 import os
-from pathlib import Path
 import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
-
 from rag import retrieve_context
 from prompt import SYSTEM_PROMPT
 from memory import add_to_memory, format_memory, clear_memory
@@ -16,7 +9,6 @@ from memory import add_to_memory, format_memory, clear_memory
 # ── Load environment variables ──
 load_dotenv()
 
-# ── Configure Groq client (OpenAI-compatible) ──
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
     api_key=os.getenv("GROQ_KEY")
@@ -94,13 +86,8 @@ def chat(user_input: str) -> str:
 
         reply = response.choices[0].message.content
 
-<<<<<<< HEAD:super roast bot/app.py
     # Store in memory
     add_to_memory(user_input, reply)
-=======
-        # Store in memory
-        add_to_memory(user_input, reply, st.session_state.session_id)
->>>>>>> upstream/main:super-roast-bot/app.py
 
         return reply
 
@@ -112,13 +99,7 @@ st.caption("I roast harder than your code roasts your CPU")
 # Sidebar
 with st.sidebar:
     st.header("⚙️ Controls")
-<<<<<<< HEAD:super roast bot/app.py
 
-=======
-    
-    enable_streaming = st.toggle("Enable Streaming", value=True, help="Show responses token-by-token")
-    
->>>>>>> upstream/main:super-roast-bot/app.py
     if st.button("🗑️ Clear Chat"):
         st.session_state.messages = []
         clear_memory(st.session_state.session_id)

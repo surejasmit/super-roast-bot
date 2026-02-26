@@ -23,8 +23,8 @@ def get_text_from_files():
                 reader = PdfReader(file_path)
                 for page in reader.pages:
                     content = page.extract_text()
-                    # FIX: Handle None return from image-based or empty PDF pages
-                    if content:
+                    # FIX: Handle None return and ensure string concatenation works
+                    if content: 
                         all_text += str(content).strip() + "\n"
             except Exception as e:
                 print(f"Error reading PDF {filename}: {e}")

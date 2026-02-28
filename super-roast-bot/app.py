@@ -11,6 +11,7 @@ New in this version:
 
 import os
 import uuid
+from pathlib import Path
 
 import streamlit as st
 from openai import OpenAI
@@ -29,15 +30,32 @@ from database import (
     load_user_profile,
     clear_user_profile,
     clear_chat_history,
+    init_database,
 )
 
-# ---------------- Environment ---------------- #
-load_dotenv()
+# ── Initialize database ────────────────────────────────────────────────────────
+init_database()
+
+# ── Load environment variables from the .env file next to this script ──
+load_dotenv(dotenv_path=Path(__file__).parent / ".env", override=True)
+
+# ── Configuration ──
+# Consolidated GROQ key handling: show a Streamlit error and stop the app
+# rather than raising an exception at import-time so the UI can render an
+# informative error to the user.
+GROQ_API_KEY = os.getenv("GROQ_KEY")
+if not GROQ_API_KEY or GROQ_API_KEY.strip() in ("", "YOUR API KEY", "your_groq_api_key_here"):
+    st.error(
+        "❌ GROQ_KEY is not set or is still the placeholder value. "
+        "Please add your Groq API key to the .env file:\n"
+        "  GROQ_KEY=your_actual_key_here"
+    )
+    st.stop()
 
 # Initialize OpenAI/Groq client securely
 client = OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key=os.getenv("GROQ_KEY"),
+    api_key=GROQ_API_KEY,
 )
 
 TEMPERATURE = float(os.getenv("TEMPERATURE", 0.8))

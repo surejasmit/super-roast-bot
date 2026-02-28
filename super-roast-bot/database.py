@@ -200,3 +200,14 @@ def clear_user_profile(session_id: str) -> None:
     """Delete the stored profile for a session."""
     with _get_connection() as conn:
         conn.execute("DELETE FROM user_profiles WHERE session_id = ?", (session_id,))
+
+
+def init_database():
+    """Initialize the database by ensuring the connection and tables exist.
+
+    This is a lightweight helper for external modules that want to ensure the
+    database schema is present before use. It simply opens and closes a
+    connection which triggers table creation in `_get_connection`.
+    """
+    conn = _get_connection()
+    conn.close()
